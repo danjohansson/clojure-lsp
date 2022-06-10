@@ -206,7 +206,11 @@
 
 (defn rename-element [uri new-name db* filename element source]
   (let [db @db*
-        references (q/find-references (:analysis db) element true)
+        remove-lang-dups-xform (comp (map #(dissoc % :lang))
+                                     (distinct))
+        references (into []
+                         remove-lang-dups-xform
+                         (q/find-references (:analysis db) element true))
         definition (q/find-definition (:analysis db) element)
         source-paths (settings/get db [:source-paths])
         client-capabilities (:client-capabilities db)
